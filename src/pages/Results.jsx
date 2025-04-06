@@ -88,6 +88,36 @@ const Results = () => {
     }
   }, [classificationResults, windowWidth]);
 
+  // Function to download classification results as CSV
+  const downloadCSV = () => {
+    if (!classificationResults || classificationResults.length === 0) {
+      return;
+    }
+
+    // Create CSV content
+    const csvHeader = "Query,Predicted Intent\n";
+    const csvContent = classificationResults.map(item => 
+      `"${item.text.replace(/"/g, '""')}","${item.predictedIntent}"`
+    ).join('\n');
+    
+    const csvData = csvHeader + csvContent;
+    
+    // Create download link
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create temporary link and trigger download
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'classification_results.csv');
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   if (!classificationResults || classificationResults.length === 0) {
     return (
       <div className="h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -159,9 +189,20 @@ const Results = () => {
   return (
     <div className="min-h-screen bg-gray-100 py-4 px-2">
       <div className="bg-white rounded-lg shadow-lg p-3 md:p-6 w-full max-w-screen-xl mx-auto">
-        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center">
-          Classification Results
-        </h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl sm:text-2xl font-bold">
+            Classification Results
+          </h2>
+          <button
+            onClick={downloadCSV}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm flex items-center transition-colors duration-300"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download CSV
+          </button>
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Pie Chart Section - Will be first on mobile, second on desktop */}
