@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import https from "https"; // Import https module for self-signed cert workaround
 import Swal from "sweetalert2";
-import { setClassificationResults } from "../store/querySlice"; // Adjust path if needed
+import { setClassificationResults } from "../features/querySlice"; // Adjust path if needed
 import "./DatasetUploadPage.css"; // Adjust if you have custom styles
 
 const API_URL = import.meta.env.VITE_API_URL;
