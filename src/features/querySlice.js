@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import https from "https"; // Import https module
 
-const API_URL = import.meta.env.VITE_BACKEND_API_URL; // FastAPI backend URL
+const API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
 export const fetchQueryIntent = createAsyncThunk(
   "query/fetchQueryIntent",
@@ -9,38 +10,16 @@ export const fetchQueryIntent = createAsyncThunk(
     try {
       const response = await axios.get(`${API_URL}/predict`, {
         params: { question: userInput },
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }), // Bypass self-signed cert
       });
-
       return {
-        labels: [response.data.prediction], // FastAPI returns { input_text, prediction }
+        labels: [response.data.prediction],
         input_text: response.data.input_text,
       };
     } catch (error) {
-      return rejectWithValue(error.response?.data?.detail || "Failed to fetch intent");
+      return rejectWithValue(error.response?.data?.error || "Failed to fetch intent");
     }
   }
 );
 
-const querySlice = createSlice({
-  name: "query",
-  initialState: { result: null, loading: false, error: null },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchQueryIntent.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.result = null;
-      })
-      .addCase(fetchQueryIntent.fulfilled, (state, action) => {
-        state.loading = false;
-        state.result = action.payload;
-      })
-      .addCase(fetchQueryIntent.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
-  },
-});
-
-export default querySlice.reducer;
+// ... rest of the code ...
