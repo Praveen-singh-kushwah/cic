@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import Papa from "papaparse";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setClassificationResults } from "../features/resultSlice";
 import Swal from "sweetalert2";
 
-const API_URL = import.meta.env.VITE_BACKEND_API_URL; // FastAPI backend URL
+const API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
 const DatasetUploadPage = () => {
   const [file, setFile] = useState(null);
@@ -16,7 +15,6 @@ const DatasetUploadPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Handle file selection and validation
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     const allowedTypes = ["text/csv", "application/json", "text/plain"];
@@ -39,7 +37,6 @@ const DatasetUploadPage = () => {
     setError("");
   };
 
-  // Process the file: upload to FastAPI and navigate to results page
   const handleUpload = async () => {
     if (!file) {
       setError("No file selected for upload.");
@@ -50,26 +47,21 @@ const DatasetUploadPage = () => {
     setError("");
 
     try {
-      // Create FormData to send the file
       const formData = new FormData();
       formData.append("file", file);
 
-      // Send file to FastAPI /predict-csv endpoint
       const response = await axios.post(`${API_URL}/predict-csv`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // FastAPI returns { results: [{ input_text, prediction }, ...] }
       const formattedResults = response.data.results.map((result) => ({
         text: result.input_text,
         predictedIntent: result.prediction,
       }));
 
-      // Dispatch the results to the Redux store
       dispatch(setClassificationResults(formattedResults));
       setIsLoading(false);
 
-      // Show SweetAlert2 success message
       Swal.fire({
         icon: "success",
         title: "Dataset Uploaded Successfully!",
@@ -77,17 +69,15 @@ const DatasetUploadPage = () => {
         confirmButtonText: "OK",
         confirmButtonColor: "#3085d6",
       }).then(() => {
-        // Navigate to the results page after the user clicks OK
         navigate("/results");
       });
     } catch (error) {
-      console.error("Error during upload:", error);
       setError(error.response?.data?.detail || "An error occurred while processing the file.");
       setIsLoading(false);
       Swal.fire({
         icon: "error",
         title: "Upload Failed",
-        text: error.response?.data?.detail || "An error occurred while processing the file. Please try again.",
+        text: error.response?.data?.detail || "An error occurred while processing the file.",
         confirmButtonText: "OK",
         confirmButtonColor: "#d33",
       });
@@ -98,10 +88,10 @@ const DatasetUploadPage = () => {
     <div className="bg-gray-100 flex flex-col items-center w-full h-screen">
       <div className="w-full max-w-md mx-auto py-4 px-4 flex flex-col h-full">
         <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">Upload Your Dataset</h1>
-       
         <div className="bg-white p-4 rounded-lg shadow-md w-full mb-4">
           <div className="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center hover:border-blue-500 transition-colors">
             <svg className="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 /target="_blank">http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
             </svg>
             <p className="text-sm mb-2 text-center text-gray-700">
@@ -120,7 +110,7 @@ const DatasetUploadPage = () => {
           </div>
 
           {error && (
-            <div className="w-full mt-3 p-2 bg-red Neanderthal-50 text-red-600 text-sm rounded-md">
+            <div className="w-full mt-3 p-2 bg-red-50 text-red-600 text-sm rounded-md">
               {error}
             </div>
           )}
