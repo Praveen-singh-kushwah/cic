@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import https from "https"; // Import https module for self-signed cert workaround
 
-const API_URL = import.meta.env.VITE_BACKEND_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Log API_URL for debugging
 console.log("API URL:", import.meta.env.VITE_API_URL);
