@@ -2,12 +2,10 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchQueryIntent } from "../features/querySlice";
 
-
 const QueryInputPage = () => {
   const dispatch = useDispatch();
   const { result, loading, error } = useSelector((state) => state.query || {});
   const [userInput, setUserInput] = useState("");
-
 
   const handleSubmit = () => {
     if (userInput.trim()) {
@@ -15,14 +13,12 @@ const QueryInputPage = () => {
     }
   };
 
-
   return (
     <div className="h-[85vh] bg-gray-100 flex items-center justify-center overflow-hidden">
       <div className="w-full max-w-md px-4">
         <h1 className="text-xl sm:text-2xl font-bold mb-4 text-center text-gray-800">
           Customer Intent Classification
         </h1>
-       
         <div className="bg-white rounded-lg shadow-md p-5 w-full">
           <div className="space-y-3">
             <input
@@ -32,7 +28,6 @@ const QueryInputPage = () => {
               placeholder="Enter your query..."
               className="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-           
             <button
               onClick={handleSubmit}
               disabled={loading || !userInput.trim()}
@@ -45,13 +40,11 @@ const QueryInputPage = () => {
             </button>
           </div>
 
-
           {error && (
             <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
               Error: {error}
             </div>
           )}
-
 
           {result && result.labels && (
             <div className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-md">
@@ -64,6 +57,5 @@ const QueryInputPage = () => {
     </div>
   );
 };
-
 
 export default QueryInputPage;
