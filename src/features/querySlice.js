@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL; // FastAPI backend URL
+const API_URL = import.meta.env.VITE_BACKEND_API_URL; // FastAPI backend URL
 
 export const fetchQueryIntent = createAsyncThunk(
   "query/fetchQueryIntent",
