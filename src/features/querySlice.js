@@ -11,17 +11,12 @@ export const fetchQueryIntent = createAsyncThunk(
         params: { question: userInput },
       });
 
-      console.log("API Response:", response.data); // Debugging log
-
-      // FastAPI returns { input_text: string, prediction: string }
-      // Transform to match the expected format in QueryInputPage
       return {
-        labels: [response.data.prediction], // Wrap prediction in labels array
+        labels: [response.data.prediction], // FastAPI returns { input_text, prediction }
         input_text: response.data.input_text,
       };
     } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
-      return rejectWithValue(error.response?.data?.detail || "API Error");
+      return rejectWithValue(error.response?.data?.detail || "Failed to fetch intent");
     }
   }
 );
@@ -35,7 +30,7 @@ const querySlice = createSlice({
       .addCase(fetchQueryIntent.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.result = null; // Reset result on new query
+        state.result = null;
       })
       .addCase(fetchQueryIntent.fulfilled, (state, action) => {
         state.loading = false;
@@ -43,7 +38,7 @@ const querySlice = createSlice({
       })
       .addCase(fetchQueryIntent.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to fetch intent";
+        state.error = action.payload;
       });
   },
 });
