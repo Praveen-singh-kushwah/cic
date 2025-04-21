@@ -12,6 +12,8 @@ const DatasetUploadPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -84,6 +86,10 @@ const DatasetUploadPage = () => {
     }
   };
 
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
+
   return (
     <div className="bg-gray-100 flex flex-col items-center w-full h-screen">
       <div className="w-full max-w-md mx-auto py-4 px-4 flex flex-col h-full">
@@ -91,7 +97,6 @@ const DatasetUploadPage = () => {
         <div className="bg-white p-4 rounded-lg shadow-md w-full mb-4">
           <div className="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center hover:border-blue-500 transition-colors">
             <svg className="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 /target="_blank">http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
             </svg>
             <p className="text-sm mb-2 text-center text-gray-700">
@@ -118,11 +123,7 @@ const DatasetUploadPage = () => {
           <button
             onClick={handleUpload}
             disabled={!file || isLoading}
-            className={`mt-4 w-full px-4 py-2 rounded-md font-bold text-white transition-colors ${
-              file && !isLoading
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-gray-400 cursor-not-allowed"
-            }`}
+            className={`mt-4 w-full px-4 py-2 rounded-md font-bold text-white transition-colors ${file && !isLoading ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"}`}
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
@@ -162,6 +163,35 @@ const DatasetUploadPage = () => {
           </ul>
         </div>
       </div>
+
+      {/* Chat Button */}
+      <button
+        onClick={toggleChat}
+        className="fixed bottom-6 right-6 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 z-50"
+      >
+        💬 Chat Here
+      </button>
+
+      {/* Chat Modal */}
+      {isChatOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-[90%] md:w-[600px] h-[80%] relative p-2">
+            <button
+              onClick={toggleChat}
+              className="absolute top-2 right-3 text-gray-600 hover:text-red-600 text-xl"
+            >
+              ✖
+            </button>
+            <iframe
+              src="http://localhost:8501" // Make sure this matches your Streamlit port
+              title="Intent Chatbot"
+              width="100%"
+              height="100%"
+              style={{ border: "none", borderRadius: "8px" }}
+            ></iframe>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
