@@ -1,41 +1,32 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setClassificationResults } from "../features/resultSlice";
+import { useDispatch } from "react-redux";
+import axios from "axios";
+import https from "https"; // Import https module for self-signed cert workaround
 import Swal from "sweetalert2";
+import { setClassificationResults } from "../features/querySlice";  // Adjust if you have custom styles
 
-const API_URL = import.meta.env.VITE_BACKEND_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
+
+// Log API_URL for debugging
+console.log("API URL:", import.meta.env.VITE_API_URL);
 
 const DatasetUploadPage = () => {
   const [file, setFile] = useState(null);
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+<<<<<<< HEAD
 
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   const dispatch = useDispatch();
+=======
+  const [error, setError] = useState("");
+>>>>>>> ff16bcf340058a7a8ca129b3d3d94834a4a2fb12
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    const allowedTypes = ["text/csv", "application/json", "text/plain"];
-    const maxSize = 5 * 1024 * 1024; // 5 MB
-
-    if (!selectedFile) {
-      setError("Please select a file.");
-      return;
-    }
-    if (!allowedTypes.includes(selectedFile.type)) {
-      setError("Invalid file type. Please upload a CSV, JSON, or TXT file.");
-      return;
-    }
-    if (selectedFile.size > maxSize) {
-      setError("File size exceeds 5 MB. Please upload a smaller file.");
-      return;
-    }
-
-    setFile(selectedFile);
+    setFile(event.target.files[0]);
     setError("");
   };
 
@@ -54,6 +45,7 @@ const DatasetUploadPage = () => {
 
       const response = await axios.post(`${API_URL}/predict-csv`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }), // Bypass self-signed cert
       });
 
       const formattedResults = response.data.results.map((result) => ({
@@ -91,6 +83,7 @@ const DatasetUploadPage = () => {
   };
 
   return (
+<<<<<<< HEAD
     <div className="bg-gray-100 flex flex-col items-center w-full h-screen">
       <div className="w-full max-w-md mx-auto py-4 px-4 flex flex-col h-full">
         <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">Upload Your Dataset</h1>
@@ -162,6 +155,25 @@ const DatasetUploadPage = () => {
             </li>
           </ul>
         </div>
+=======
+    <div className="dataset-upload-container">
+      <h2>Upload Dataset</h2>
+      <div className="upload-form">
+        <input
+          type="file"
+          accept=".csv,.json,.txt"
+          onChange={handleFileChange}
+          disabled={isLoading}
+        />
+        {error && <p className="error-message">{error}</p>}
+        <button
+          onClick={handleUpload}
+          disabled={isLoading || !file}
+          className={isLoading ? "loading" : ""}
+        >
+          {isLoading ? "Uploading..." : "Upload"}
+        </button>
+>>>>>>> ff16bcf340058a7a8ca129b3d3d94834a4a2fb12
       </div>
 
       {/* Chat Button */}
