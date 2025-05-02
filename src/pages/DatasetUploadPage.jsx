@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import axios from "axios";
-import https from "https"; // Import https module for self-signed cert workaround
+import https from "https";
 import Swal from "sweetalert2";
-import { setClassificationResults } from "../features/querySlice";  // Adjust if you have custom styles
+import { setClassificationResults } from "../features/classificationSlice";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -14,14 +14,8 @@ console.log("API URL:", import.meta.env.VITE_API_URL);
 const DatasetUploadPage = () => {
   const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-<<<<<<< HEAD
-
-  const [isChatOpen, setIsChatOpen] = useState(false);
-
-  const dispatch = useDispatch();
-=======
   const [error, setError] = useState("");
->>>>>>> ff16bcf340058a7a8ca129b3d3d94834a4a2fb12
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -42,11 +36,15 @@ const DatasetUploadPage = () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      console.log("Sending request to:", `${API_URL}/predict-csv`, "with file:", file.name);
 
       const response = await axios.post(`${API_URL}/predict-csv`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }), // Bypass self-signed cert
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+        timeout: 30000,
       });
+
+      console.log("Response received:", response.data);
 
       const formattedResults = response.data.results.map((result) => ({
         text: result.input_text,
@@ -66,6 +64,12 @@ const DatasetUploadPage = () => {
         navigate("/results");
       });
     } catch (error) {
+      console.error("Upload error details:", {
+        message: error.message,
+        code: error.code,
+        response: error.response?.data,
+        config: error.config,
+      });
       setError(error.response?.data?.detail || "An error occurred while processing the file.");
       setIsLoading(false);
       Swal.fire({
@@ -83,7 +87,6 @@ const DatasetUploadPage = () => {
   };
 
   return (
-<<<<<<< HEAD
     <div className="bg-gray-100 flex flex-col items-center w-full h-screen">
       <div className="w-full max-w-md mx-auto py-4 px-4 flex flex-col h-full">
         <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">Upload Your Dataset</h1>
@@ -97,7 +100,9 @@ const DatasetUploadPage = () => {
             </p>
             <input
               type="file"
+              accept=".csv,.json,.txt"
               onChange={handleFileChange}
+              disabled={isLoading}
               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
             />
             {file && (
@@ -155,55 +160,36 @@ const DatasetUploadPage = () => {
             </li>
           </ul>
         </div>
-=======
-    <div className="dataset-upload-container">
-      <h2>Upload Dataset</h2>
-      <div className="upload-form">
-        <input
-          type="file"
-          accept=".csv,.json,.txt"
-          onChange={handleFileChange}
-          disabled={isLoading}
-        />
-        {error && <p className="error-message">{error}</p>}
+
+        {/* Chat Button */}
         <button
-          onClick={handleUpload}
-          disabled={isLoading || !file}
-          className={isLoading ? "loading" : ""}
+          onClick={toggleChat}
+          className="fixed bottom-6 right-6 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 z-50"
         >
-          {isLoading ? "Uploading..." : "Upload"}
+          💬 Chat Here
         </button>
->>>>>>> ff16bcf340058a7a8ca129b3d3d94834a4a2fb12
-      </div>
 
-      {/* Chat Button */}
-      <button
-        onClick={toggleChat}
-        className="fixed bottom-6 right-6 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 z-50"
-      >
-        💬 Chat Here
-      </button>
-
-      {/* Chat Modal */}
-      {isChatOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-[90%] md:w-[600px] h-[80%] relative p-2">
-            <button
-              onClick={toggleChat}
-              className="absolute top-2 right-3 text-gray-600 hover:text-red-600 text-xl"
-            >
-              ✖
-            </button>
-            <iframe
-              src="http://localhost:8501" // Make sure this matches your Streamlit port
-              title="Intent Chatbot"
-              width="100%"
-              height="100%"
-              style={{ border: "none", borderRadius: "8px" }}
-            ></iframe>
+        {/* Chat Modal */}
+        {isChatOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl w-[90%] md:w-[600px] h-[80%] relative p-2">
+              <button
+                onClick={toggleChat}
+                className="absolute top-2 right-3 text-gray-600 hover:text-red-600 text-xl"
+              >
+                ✖
+              </button>
+              <iframe
+                src="http://localhost:8501" // TODO: Update to production Streamlit URL (e.g., Streamlit Cloud or hosted server)
+                title="Intent Chatbot"
+                width="100%"
+                height="100%"
+                style={{ border: "none", borderRadius: "8px" }}
+              ></iframe>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
